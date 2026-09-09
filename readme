@@ -1,0 +1,6 @@
+🔹 Varianta 4. Conversie monedă
+Realizați o aplicație mobilă care permite conversia unei sume între mai multe valute.
+Input: suma – TextField
+UI controls: două DropdownButton pentru moneda sursă și moneda destinație, ElevatedButton
+Output: suma convertită afișată într-un Text.
+Pentru simplificare, se vor utiliza cursuri valutare fixe introduse direct în aplicație.
