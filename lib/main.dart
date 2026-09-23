@@ -41,7 +41,6 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
   String _sourceCurrency = 'RON';
   String _targetCurrency = 'EUR';
   String? _result;
-  String? _errorMessage;
 
   @override
   void dispose() {
@@ -54,7 +53,6 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
 
     if (amount == null || amount < 0) {
       setState(() {
-        _errorMessage = 'Introduceți o sumă validă, mai mare sau egală cu 0.';
         _result = null;
       });
       return;
@@ -64,7 +62,6 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
         _ratesToRon[_targetCurrency]!;
 
     setState(() {
-      _errorMessage = null;
       _result = '${convertedAmount.toStringAsFixed(2)} $_targetCurrency';
     });
   }
@@ -73,71 +70,48 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Conversie monedă')),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Icon(Icons.currency_exchange, size: 72),
-                  const SizedBox(height: 24),
-                  TextField(
-                    controller: _amountController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(
-                      labelText: 'Sumă',
-                      hintText: 'Exemplu: 100',
-                      border: OutlineInputBorder(),
-                    ),
-                    onSubmitted: (_) => _convert(),
-                  ),
-                  const SizedBox(height: 16),
-                  _currencyDropdown(
-                    label: 'Moneda sursă',
-                    value: _sourceCurrency,
-                    onChanged: (value) => setState(() => _sourceCurrency = value!),
-                  ),
-                  const SizedBox(height: 16),
-                  _currencyDropdown(
-                    label: 'Moneda destinație',
-                    value: _targetCurrency,
-                    onChanged: (value) => setState(() => _targetCurrency = value!),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: _convert,
-                    icon: const Icon(Icons.calculate),
-                    label: const Text('Convertește'),
-                  ),
-                  if (_errorMessage != null) ...[
-                    const SizedBox(height: 16),
-                    Text(_errorMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                  ],
-                  if (_result != null) ...[
-                    const SizedBox(height: 24),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            const Text('Suma convertită'),
-                            const SizedBox(height: 8),
-                            Text(
-                              _result!,
-                              style: Theme.of(context).textTheme.headlineMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Input: suma
+            TextField(
+              controller: _amountController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(labelText: 'Sumă'),
             ),
-          ),
+            const SizedBox(height: 16),
+
+            // UI control 1: Dropdown Moneda Sursă
+            _currencyDropdown(
+              label: 'Moneda sursă',
+              value: _sourceCurrency,
+              onChanged: (value) => setState(() => _sourceCurrency = value!),
+            ),
+            const SizedBox(height: 16),
+
+            // UI control 2: Dropdown Moneda Destinație
+            _currencyDropdown(
+              label: 'Moneda destinație',
+              value: _targetCurrency,
+              onChanged: (value) => setState(() => _targetCurrency = value!),
+            ),
+            const SizedBox(height: 16),
+
+            // UI control 3: ElevatedButton
+            ElevatedButton(
+              onPressed: _convert,
+              child: const Text('Convertește'),
+            ),
+            const SizedBox(height: 24),
+
+            // Output: suma convertită afișată într-un Text
+            if (_result != null)
+              Text(
+                _result!,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+          ],
         ),
       ),
     );
@@ -149,7 +123,7 @@ class _CurrencyConverterPageState extends State<CurrencyConverterPage> {
     required ValueChanged<String?> onChanged,
   }) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
       items: _ratesToRon.keys
           .map((currency) => DropdownMenuItem(value: currency, child: Text(currency)))
